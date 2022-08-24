@@ -1,8 +1,13 @@
+using Common;
+using FluentValidation;
+using static Common.ValidationError;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 var app = builder.Build();
 
@@ -10,34 +15,47 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.EnableTryItOutByDefault());
 }
 
 app.UseHttpsRedirection();
-app.UseCors(c => c.AllowAnyOrigin());
-
-var summaries = new[]
+app.UseCors(c =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    c.AllowAnyOrigin();
+    c.AllowAnyHeader();
+    c.AllowAnyMethod();
+});
 
-app.MapGet("/weatherforecast", () =>
+app.MapPost("/form", (FormRequest request, IValidator<FormRequest> validator) =>
 {
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateTime.Now.AddDays(index),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    var validation = validator.Validate(request);
+    if (!validation.IsValid)
+    {
+        return Results.BadRequest(new ValidationError
+        {
+            invalidParameters = validation.Errors.Select(e => new InvalidParameter
+            {
+                name = e.PropertyName,
+                reason = e.ErrorMessage
+            })
+        });
+    }
+
+    return Results.Ok();
+});
 
 app.Run();
 
-internal record WeatherForecast(DateTime Date, int TemperatureC, string? Summary)
+public class FormRequestValidator : AbstractValidator<FormRequest>
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    public FormRequestValidator()
+    {
+        RuleFor(m => m.email)
+            .NotEmpty().WithMessage("Can not be empty")
+            .EmailAddress().WithMessage("Not a valid email address");
+
+        RuleFor(m => m.height)
+            .NotEmpty().WithMessage("Can not be empty")
+            .Must(m => int.TryParse(m, out int num)).WithMessage("Must be a number");
+    }
 }

@@ -1,7 +1,74 @@
 ﻿@page "/"
+@inject Api api
 
-<PageTitle>Index</PageTitle>
+<MudGrid>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Hello, world!</MudText>
-<MudText Class="mb-8">Welcome to your new app, powered by MudBlazor!</MudText>
-<MudAlert Severity="Severity.Normal">You can find documentation and examples on our website here: <MudLink Href="https://mudblazor.com" Typo="Typo.body2" Color="Color.Inherit"><b>www.mudblazor.com</b></MudLink></MudAlert>
+    <MudItem xs="12" sm="5">
+
+        <MudPaper Class="pa-4">
+
+            <MudTextField T="string" Label="Email" Variant="Variant.Outlined" Class="mb-4" @bind-Value="Request.email" @ref="email" />
+            <MudTextField T="string" Label="Height (cm)" Variant="Variant.Outlined" Class="mb-4" @bind-Value="Request.height" @ref="height" />
+
+            <MudButton FullWidth="true" Variant="Variant.Filled" OnClick="SendRequest">Send request</MudButton>
+
+        </MudPaper>
+
+    </MudItem>
+
+    <MudItem xs="12" sm="7">
+
+        <MudPaper Class="pa-4 mb-6">
+            <MudText>Request</MudText>
+            <MudElement HtmlTag="pre">@Request</MudElement>
+        </MudPaper>
+
+        <MudPaper Class="pa-4">
+            <MudText>Response</MudText>
+            <MudText>@Response?.StatusCode.ToString()</MudText>
+            <MudElement HtmlTag="pre">@Response?.Error</MudElement>
+        </MudPaper>
+
+    </MudItem>
+
+</MudGrid>
+
+@code{
+
+    FormRequest Request = new();
+    Response Response;
+    MudTextField<string> email;
+    MudTextField<string> height;
+    Dictionary<string, MudTextField<string>> inputs;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        inputs = new() { [nameof(email)] = email, [nameof(height)] = height };
+    }
+
+    async Task SendRequest()
+    {
+        ClearErrors();
+
+        Response = await api.PostForm(Request);
+
+        if (!Response.Success)
+        {
+            foreach (var error in Response.Error.invalidParameters)
+            {
+                var input = inputs[error.name];
+                input.ErrorText = error.reason;
+                input.Error = true;
+            }
+        }
+    }
+
+    void ClearErrors()
+    {
+        foreach (var (name, input) in inputs)
+        {
+            input.ErrorText = null;
+            input.Error = false;
+        }
+    }
+}

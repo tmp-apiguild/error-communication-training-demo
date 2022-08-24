@@ -10,6 +10,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 var uri = builder.Configuration["api"] ?? throw new Exception("Api url missing :(");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(uri) });
+builder.Services.AddScoped<Api>();
 builder.Services.AddMudServices();
 
 await builder.Build().RunAsync();
