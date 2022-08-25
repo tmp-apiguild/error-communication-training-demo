@@ -15,13 +15,13 @@ public class Api
         this.logger = logger;
     }
 
-    public async Task<Response> PostForm(FormRequest request)
+    public async Task<FormResponse> PostForm(FormRequest request)
     {
         var httpresponse = await api.PostAsJsonAsync("form", request);
 
         logger.LogInformation(JsonConvert.SerializeObject(httpresponse));
 
-        var response = new Response
+        var response = new FormResponse
         {
             Success = httpresponse.IsSuccessStatusCode,
             StatusCode = (int)httpresponse.StatusCode,
@@ -35,7 +35,7 @@ public class Api
     }
 }
 
-public class Response
+public class FormResponse
 {
     public bool Success { get; set; }
 

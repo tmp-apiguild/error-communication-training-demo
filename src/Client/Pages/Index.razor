@@ -7,10 +7,10 @@
 
         <MudPaper Class="pa-4">
 
-            <MudTextField T="string" Label="Email" Variant="Variant.Outlined" Class="mb-4" @bind-Value="Request.email" @ref="email" />
-            <MudTextField T="string" Label="Height (cm)" Variant="Variant.Outlined" Class="mb-4" @bind-Value="Request.height" @ref="height" />
+            <MudTextField T="string" Label="Email" Variant="Variant.Outlined" Class="mb-4" @bind-Value="Request.email" @ref="email" Immediate="true" />
+            <MudTextField T="string" Label="Height (cm)" Variant="Variant.Outlined" Class="mb-4" @bind-Value="Request.height" @ref="height" Immediate="true" />
 
-            <MudButton FullWidth="true" Variant="Variant.Filled" OnClick="SendRequest">Send request</MudButton>
+            <MudButton FullWidth="true" Variant="Variant.Filled" OnClick="SendRequest" Color="Color.Tertiary">Send request</MudButton>
 
         </MudPaper>
 
@@ -24,9 +24,16 @@
         </MudPaper>
 
         <MudPaper Class="pa-4">
-            <MudText>Response</MudText>
-            <MudText>@Response?.StatusCode.ToString()</MudText>
-            <MudElement HtmlTag="pre">@Response?.Error</MudElement>
+            <MudPaper Class="d-flex flex-row flex-grow-1 gap-4 justify-space-between " Elevation="0">
+                <MudText>Response</MudText>
+                @if (Response is not null)
+                {
+                    <MudChip Variant="Variant.Outlined" Color="@(Response.StatusCode == 200 ? Color.Success : Color.Warning)">
+                        @Response.StatusCode.ToString()
+                    </MudChip>
+                }
+            </MudPaper>
+            <MudElement HtmlTag="pre">@(Response?.Error ?? "")</MudElement>
         </MudPaper>
 
     </MudItem>
@@ -36,7 +43,7 @@
 @code{
 
     FormRequest Request = new();
-    Response Response;
+    FormResponse Response;
     MudTextField<string> email;
     MudTextField<string> height;
     Dictionary<string, MudTextField<string>> inputs;
