@@ -42,7 +42,7 @@
 
 </MudGrid>
 
-@code{
+    @code{
 
     FormRequest Request = new();
     FormResponse Response;
@@ -63,11 +63,10 @@
 
         if (!Response.Success)
         {
-            foreach (var error in Response.Error.invalidParameters)
+            foreach (var parameter in Response.Error.invalidParameters)
             {
-                var input = inputs[error.name];
-                input.ErrorText = error.reason;
-                input.Error = true;
+                var input = inputs[parameter.name];
+                input.AddError(parameter.reason);
             }
         }
     }
