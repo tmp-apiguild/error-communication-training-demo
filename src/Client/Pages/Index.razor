@@ -19,20 +19,22 @@
     <MudItem xs="12" sm="7">
 
         <MudPaper Class="pa-4 mb-6">
-            <MudText>Request</MudText>
+            <MudText Typo="Typo.h6">Request</MudText>
+            <MudDivider Class="my-4"></MudDivider>
             <MudElement HtmlTag="pre">@Request</MudElement>
         </MudPaper>
 
         <MudPaper Class="pa-4">
-            <MudPaper Class="d-flex flex-row flex-grow-1 gap-4 justify-space-between " Elevation="0">
-                <MudText>Response</MudText>
+            <MudPaper Class="d-flex flex-row flex-grow-1 gap-4 justify-space-between align-center" Elevation="0">
+                <MudText Typo="Typo.h6">Response</MudText>
                 @if (Response is not null)
                 {
-                    <MudChip Variant="Variant.Outlined" Color="@(Response.StatusCode == 200 ? Color.Success : Color.Warning)">
+                    <MudChip Variant="Variant.Outlined" Size="Size.Small" Color="@(Response.StatusCode == 200 ? Color.Success : Color.Warning)">
                         @Response.StatusCode.ToString()
                     </MudChip>
                 }
             </MudPaper>
+            <MudDivider Class="my-4"></MudDivider>
             <MudElement HtmlTag="pre">@(Response?.Error ?? "")</MudElement>
         </MudPaper>
 
