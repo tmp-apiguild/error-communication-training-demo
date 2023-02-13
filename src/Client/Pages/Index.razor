@@ -10,7 +10,16 @@
             <MudTextField T="string" Label="Email" Variant="Variant.Outlined" Class="mb-4" @bind-Value="Request.email" @ref="email" Immediate="true" />
             <MudTextField T="string" Label="Height (cm)" Variant="Variant.Outlined" Class="mb-4" @bind-Value="Request.height" @ref="height" Immediate="true" />
 
-            <MudButton FullWidth="true" Variant="Variant.Filled" OnClick="SendRequest" Color="Color.Tertiary">Send request</MudButton>
+            <MudButton FullWidth="true" Variant="Variant.Filled" OnClick="HandleButtonPress" Color="Color.Tertiary" Disabled="processing" Style="height:3em">
+                @if(!processing)
+                {
+                    <MudText>Send request</MudText>
+                }
+                else
+                {
+                    <MudProgressLinear Color="Color.Tertiary" Indeterminate="true" Rounded="true" Class="mx-2" />
+                }
+            </MudButton>
 
         </MudPaper>
 
@@ -42,24 +51,34 @@
 
 </MudGrid>
 
-    @code{
+@code{
 
     FormRequest Request = new();
     FormResponse Response;
     MudTextField<string> email;
     MudTextField<string> height;
     Dictionary<string, MudTextField<string>> inputs;
+    bool processing = false;
 
     protected override void OnAfterRender(bool firstRender)
     {
         inputs = new() { [nameof(email)] = email, [nameof(height)] = height };
     }
 
+    async Task HandleButtonPress()
+    {
+        processing = true;
+        var delay = Task.Delay(700);
+        var request = SendRequest();
+        await Task.WhenAll(delay, request);
+        processing = false;
+    }
+
     async Task SendRequest()
     {
         ClearErrors();
 
-        Response = await api.PostForm(Request);
+        Response = await api.Send(Request);
 
         if (!Response.Success)
         {

@@ -15,7 +15,7 @@ public class Api
         this.logger = logger;
     }
 
-    public async Task<FormResponse> PostForm(FormRequest request)
+    public async Task<FormResponse> Send(FormRequest request)
     {
         var httpresponse = await api.PostAsJsonAsync("api/PostForm", request);
 
