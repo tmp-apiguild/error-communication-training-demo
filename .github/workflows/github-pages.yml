@@ -23,6 +23,10 @@ jobs:
     
     - name: Publish
       run: dotnet publish src/Client/Client.csproj -c Release -o release --nologo
+      
+    # changes the base-tag in index.html from '/' to 'error-communication-training' to match GitHub Pages repository subdirectory
+    - name: Change base-tag in index.html from / to error-communication-training
+      run: sed -i 's/<base href="\/" \/>/<base href="\/error-communication-training\/" \/>/g' release/wwwroot/index.html
 
     - name: GitHub Pages
       uses: crazy-max/ghaction-github-pages@v3.1.0
@@ -35,7 +39,3 @@ jobs:
         verbose: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
-    # changes the base-tag in index.html from '/' to 'error-communication-training' to match GitHub Pages repository subdirectory
-    - name: Change base-tag in index.html from / to error-communication-training
-      run: sed -i 's/<base href="\/" \/>/<base href="\/error-communication-training\/" \/>/g' release/wwwroot/index.html        
