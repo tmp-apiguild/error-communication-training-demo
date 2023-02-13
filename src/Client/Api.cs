@@ -17,7 +17,7 @@ public class Api
 
     public async Task<FormResponse> PostForm(FormRequest request)
     {
-        var httpresponse = await api.PostAsJsonAsync("form", request);
+        var httpresponse = await api.PostAsJsonAsync("api/PostForm", request);
 
         logger.LogInformation(JsonConvert.SerializeObject(httpresponse));
 
