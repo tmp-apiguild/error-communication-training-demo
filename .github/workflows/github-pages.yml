@@ -6,6 +6,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ "master" ]
+    
+permissions: read-all|write-all
 
 jobs:
   build-and-deploy-to-github-pages:
